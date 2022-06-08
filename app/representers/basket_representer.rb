@@ -3,30 +3,37 @@ class BasketRepresenter
     @basket = basket
   end
 
-  def basket_calculator(items, **options)
+  def calculate_total(items, **options)
     total = 0
+    vat = 1.1
     items.each do |item|
       total += item.price * item.quantity
     end
-    total *= (1 - (options[:discount] || 0))
-    total *= 1.1
-    total += (options[:shipment] || 5)
-    total = total.to_i
+    if total.zero?
+      total=0
+    else
+      total *= (1 - (options[:discount] || 0))
+      total *= vat
+      total += (options[:shipment] || 5)
+    end
+    total = total.round(2)
   end
 
   def as_json
     basket_data = {
+      basket_id: 0,
       items: [],
       total: 0
     }
     basket.items.each do |item|
       basket_data[:items].push({
-        id: item.id,
+        item_id: item.id,
         price: item.price,
         quantity: item.quantity
       })
     end
-    basket_data[:total] = basket_calculator(basket.items)
+    basket_data[:basket_id] = basket.id
+    basket_data[:total] = calculate_total(basket.items, discount: 0.1, shipment: 7)
     basket_data
   end
 

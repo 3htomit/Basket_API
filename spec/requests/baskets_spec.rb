@@ -33,20 +33,22 @@ RSpec.describe "Baskets", type: :request do
       expect(response).to have_http_status(:ok)
       expect(response_body).to eq(
         {
-          "basket_id" => 1,
-          "items" => [
+          'basket_id' => 1,
+          'items' => [
           {
-          "item_id" => 1,
-          "price" => 15,
-          "quantity" => 2
+            'item_id' => 1,
+            'price' => 15,
+            'quantity' => 2
           },
           {
-          "item_id" => 2,
-          "price" => 5,
-          "quantity" => 4
+            'item_id' => 2,
+            'price' => 5,
+            'quantity' => 4
           }
           ],
-          "total" => 56.5
+          'discount' => 0,
+          'shipment' => 5,
+          'total' => 60
         }
       )
     end
@@ -56,28 +58,39 @@ RSpec.describe "Baskets", type: :request do
     it 'creates a new basket' do
       expect {
         post '/api/v1/baskets', params: {
-          item_ids: [item1.id, item2.id]
+          item_ids: [item1.id, item2.id, item3.id],
+          options: {
+            discount: 0.1,
+            shipment: 7
+          }
         }
       }.to change { Basket.count }.from(0).to(1)
 
       expect(response).to have_http_status(:created)
       expect(response_body).to eq(
         {
-          "basket_id" => 1,
-          "items" => [
+          'basket_id' => 1,
+          'items' => [
           {
-          "item_id" => 1,
-          "price" => 15,
-          "quantity" => 2
+            'item_id' => 1,
+            'price' => 15,
+            'quantity' => 2
           },
           {
-          "item_id" => 2,
-          "price" => 20,
-          "quantity" => 1
+            'item_id' => 2,
+            'price' => 20,
+            'quantity' => 1
+          },
+          {
+            'item_id' => 3,
+            'price' => 5,
+            'quantity' => 4
           }
           ],
-          "total" => 56.5
-        }
+          'discount' => 0.1,
+          'shipment' => 7.0,
+          'total' => 76.3
+          }
       )
     end
   end

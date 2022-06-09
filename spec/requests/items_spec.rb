@@ -29,7 +29,7 @@ describe 'Items API', type: :request do
   describe 'GET /items/:id' do
     before do
       @item1 = FactoryBot.create(:item, price: 23, quantity: 2)
-      @item2 = FactoryBot.create(:item, price: 17, quantity: 3 )
+      @item2 = FactoryBot.create(:item, price: 17, quantity: 3)
     end
 
     it 'returns a item' do

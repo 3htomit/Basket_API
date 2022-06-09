@@ -15,9 +15,12 @@ module Api
 
       def create
         new_basket = Basket.new(options_params)
-        params.require(:item_ids).each do |item_id|
-          UsersChoice.create(basket: new_basket, item_id: item_id.to_i)
-        end
+        create_users_choices(params.require(:item_ids), new_basket) unless params.require(:item_ids).size.zero?
+        new_basket.total = calculate_total(
+          new_basket.items,
+          discount: new_basket.discount,
+          shipment: new_basket.shipment
+        )
 
         if new_basket.save
           render json: BasketRepresenter.new(new_basket).as_json, status: :created
@@ -30,6 +33,28 @@ module Api
 
       def options_params
         params.require(:options).permit(:discount, :shipment)
+      end
+
+      def create_users_choices(item_ids, new_basket)
+        item_ids.each do |item_id|
+          UsersChoice.create(basket: new_basket, item_id: item_id.to_i)
+        end
+      end
+
+      def calculate_total(items, **options)
+        total = 0
+        vat = 1.1
+        items.each do |item|
+          total += item.price * item.quantity
+        end
+        if total.zero?
+          total=0
+        else
+          total *= (1 - options[:discount])
+          total *= vat
+          total += options[:shipment]
+        end
+        total = total.round(2)
       end
     end
   end

@@ -33,7 +33,7 @@ class BasketRepresenter
       })
     end
     basket_data[:basket_id] = basket.id
-    basket_data[:total] = calculate_total(basket.items, discount: 0.1, shipment: 7)
+    basket_data[:total] = calculate_total(basket.items, discount: basket.discount, shipment: basket.shipment)
     basket_data
   end
 

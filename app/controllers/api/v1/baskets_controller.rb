@@ -14,7 +14,7 @@ module Api
       end
 
       def create
-        new_basket = Basket.new()
+        new_basket = Basket.new(options_params)
         params.require(:item_ids).each do |item_id|
           UsersChoice.create(basket: new_basket, item_id: item_id.to_i)
         end
@@ -24,6 +24,12 @@ module Api
         else
           render json: new_basket.errors, status: :unprocessable_entity
         end
+      end
+
+      private
+
+      def options_params
+        params.require(:options).permit(:discount, :shipment)
       end
     end
   end

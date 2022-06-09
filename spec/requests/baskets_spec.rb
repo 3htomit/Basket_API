@@ -17,19 +17,68 @@ RSpec.describe "Baskets", type: :request do
     it 'returns all baskets' do
       get '/api/v1/baskets'
 
-      # expect(response).to have_http_status(:success)
-      # expect(response_body.size).to eq(2)
-      # expect(response_body).to eq(
-      #   [{
-      #     'id' => 1,
-      #     'price' => 23,
-      #     'quantity' => 2
-      #   }, {
-      #     'id' => 2,
-      #     'price' => 17,
-      #     'quantity' => 3
-      #   }]
-      # )
+      expect(response).to have_http_status(:success)
+      expect(response_body.size).to eq(3)
+    end
+  end
+
+  describe 'GET /baskets/:id' do
+    before do
+      @basket1 = FactoryBot.create(:basket, items: items1)
+    end
+
+    it 'returns a basket' do
+      get "/api/v1/baskets/#{@basket1.id}"
+
+      expect(response).to have_http_status(:ok)
+      expect(response_body).to eq(
+        {
+          "basket_id" => 1,
+          "items" => [
+          {
+          "item_id" => 1,
+          "price" => 15,
+          "quantity" => 2
+          },
+          {
+          "item_id" => 2,
+          "price" => 5,
+          "quantity" => 4
+          }
+          ],
+          "total" => 56.5
+        }
+      )
+    end
+  end
+
+  describe 'POST /baskets' do
+    it 'creates a new basket' do
+      expect {
+        post '/api/v1/baskets', params: {
+          item_ids: [item1.id, item2.id]
+        }
+      }.to change { Basket.count }.from(0).to(1)
+
+      expect(response).to have_http_status(:created)
+      expect(response_body).to eq(
+        {
+          "basket_id" => 1,
+          "items" => [
+          {
+          "item_id" => 1,
+          "price" => 15,
+          "quantity" => 2
+          },
+          {
+          "item_id" => 2,
+          "price" => 20,
+          "quantity" => 1
+          }
+          ],
+          "total" => 56.5
+        }
+      )
     end
   end
 end

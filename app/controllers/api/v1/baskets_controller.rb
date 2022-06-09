@@ -12,6 +12,19 @@ module Api
 
         render json: BasketRepresenter.new(basket).as_json
       end
+
+      def create
+        new_basket = Basket.new()
+        params.require(:item_ids).each do |item_id|
+          new_users_choice = UsersChoice.create(basket: new_basket, item_id: item_id.to_i)
+        end
+
+        if new_basket.save
+          render json: BasketRepresenter.new(new_basket).as_json, status: :created
+        else
+          render json: new_basket.errors, status: :unprocessable_entity
+        end
+      end
     end
   end
 end

@@ -12,7 +12,9 @@
 
 ActiveRecord::Schema[7.0].define(version: 2022_06_07_121939) do
   create_table "baskets", force: :cascade do |t|
-    t.integer "total"
+    t.float "total", default: 0.0
+    t.float "discount"
+    t.float "shipment"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
